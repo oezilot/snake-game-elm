@@ -1,6 +1,7 @@
 module Counters exposing (..)
 
 import Browser
+import Element exposing (..)
 import Html exposing (Html, button, div, text)
 import Html.Events exposing (onClick)
 import List exposing (indexedMap, length)
@@ -87,20 +88,18 @@ update msg counters =
 renderCounter : Int -> Counter -> Html Msg
 renderCounter index counter =
     div []
-        [ button [ onClick (Dec index) ] [ text "-" ]
-        , text (fromInt counter)
-        , button [ onClick (Inc index) ] [ text "+" ] -- das onclick ist eine html message was asgesendet wird falls der button gedrückt wird (bei diesem button wird die Inc-Message ausgesendet)
-        , button [ onClick (Reset index) ] [ text "reset" ]
-        , button [ onClick (Remove index) ] [ text "remove" ]
+        [ button [ onClick (Dec index) ] []
+        , Html.text (fromInt counter)
+        , button [ onClick (Inc index) ] [] -- das onclick ist eine html message was asgesendet wird falls der button gedrückt wird (bei diesem button wird die Inc-Message ausgesendet)
+        , button [ onClick (Reset index) ] []
+        , button [ onClick (Remove index) ] []
         ]
 
 
 render : Model -> Html Msg
 render counters =
-    div []
-        [ button [ onClick Add ] [ text "Add Counter" ]
-        , div [] (indexedMap renderCounter counters)
-        ]
+    button1 Add "Add a Counti"
+        |> layout []
 
 
 main : Program () Model Msg
