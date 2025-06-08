@@ -1,12 +1,17 @@
 module MoveSvg exposing (..)
 
 import Browser
-import Browser.Events exposing (onKeyDown)
+import Browser.Events exposing (onAnimationFrameDelta, onKeyDown)
 import Html exposing (..)
 import Json.Decode as Decode
+import Platform.Cmd exposing (batch)
 import Svg exposing (circle, rect, svg)
 import Svg.Attributes exposing (cx, cy, fill, height, r, width, x)
 import Tuple exposing (first, second)
+
+
+
+--------------------------------------------
 
 
 fieldDims : Int
@@ -38,6 +43,7 @@ type Model
     = Model
         { snake : Snake
         , food : Position
+        , tick : Int
         }
 
 
@@ -56,6 +62,7 @@ initialModel =
                 , isGrowing = False
                 }
         , food = ( 10, 10 )
+        , tick = 0
         }
 
 
@@ -162,26 +169,38 @@ moveSnake (Snake { direction, head, body, isGrowing }) =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg (Model { snake, food }) =
+update msg (Model { snake, food, tick }) =
     case msg of
         Move direction ->
-            ( Model { snake = changeDirection direction snake, food = food }, Cmd.none )
+            ( Model { snake = changeDirection direction snake, food = food, tick = tick }, Cmd.none )
 
         FoodCollision ->
             ( Model
                 { snake = feedSnake snake
                 , food = food
+                , tick = tick
                 }
             , Cmd.none
             )
 
         TimeTick ->
-            ( Model
-                { snake = moveSnake snake
-                , food = food
-                }
-            , Cmd.none
-            )
+            if tick < 25 then
+                ( Model
+                    { snake = snake
+                    , food = food
+                    , tick = tick + 1
+                    }
+                , Cmd.none
+                )
+
+            else
+                ( Model
+                    { snake = moveSnake snake
+                    , food = food
+                    , tick = 0
+                    }
+                , Cmd.none
+                )
 
 
 
@@ -203,8 +222,12 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = subscriptions
+        , subscriptions = \_ -> batch [ subscriptionKey, subscriptionTick ]
         }
+
+
+
+-- hier wird bestimmt welche message aufgerufen wird
 
 
 str2msg : String -> Msg
@@ -223,9 +246,19 @@ str2msg str =
             Move Right
 
 
-subscriptions : Model -> Sub Msg
-subscriptions _ =
+subscriptionKey : Model -> Sub Msg
+subscriptionKey _ =
     Sub.map str2msg <| onKeyDown (Decode.field "key" Decode.string)
+
+
+subscriptionTick : Model -> Sub Msg
+subscriptionTick _ =
+    onAnimationFrameDelta timeToMessage
+
+
+timeToMessage : Float -> Msg
+timeToMessage time =
+    TimeTick
 
 
 
