@@ -171,9 +171,13 @@ moveSnake (Snake { direction, head, body, isGrowing }) =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg (Model { snake, food, tick }) =
+    let
+        (Snake { direction, head, body, isGrowing }) =
+            snake
+    in
     case msg of
-        Move direction ->
-            ( Model { snake = changeDirection direction snake, food = food, tick = tick }, Cmd.none )
+        Move dir ->
+            ( Model { snake = changeDirection dir snake, food = food, tick = tick }, Cmd.none )
 
         FoodCollision ->
             ( Model
@@ -190,6 +194,15 @@ update msg (Model { snake, food, tick }) =
                     { snake = snake
                     , food = food
                     , tick = tick + 1
+                    }
+                , Cmd.none
+                )
+
+            else if head == food then
+                ( Model
+                    { snake = feedSnake snake
+                    , food = food
+                    , tick = tick
                     }
                 , Cmd.none
                 )

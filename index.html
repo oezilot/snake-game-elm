@@ -11013,14 +11013,19 @@ var $author$project$MoveSvg$update = F2(
 		var snake = _v0.a.snake;
 		var food = _v0.a.food;
 		var tick = _v0.a.tick;
+		var _v1 = snake;
+		var direction = _v1.a.direction;
+		var head = _v1.a.head;
+		var body = _v1.a.body;
+		var isGrowing = _v1.a.isGrowing;
 		switch (msg.$) {
 			case 'Move':
-				var direction = msg.a;
+				var dir = msg.a;
 				return _Utils_Tuple2(
 					$author$project$MoveSvg$Model(
 						{
 							food: food,
-							snake: A2($author$project$MoveSvg$changeDirection, direction, snake),
+							snake: A2($author$project$MoveSvg$changeDirection, dir, snake),
 							tick: tick
 						}),
 					$elm$core$Platform$Cmd$none);
@@ -11037,6 +11042,13 @@ var $author$project$MoveSvg$update = F2(
 				return (tick < 2) ? _Utils_Tuple2(
 					$author$project$MoveSvg$Model(
 						{food: food, snake: snake, tick: tick + 1}),
+					$elm$core$Platform$Cmd$none) : (_Utils_eq(head, food) ? _Utils_Tuple2(
+					$author$project$MoveSvg$Model(
+						{
+							food: food,
+							snake: $author$project$MoveSvg$feedSnake(snake),
+							tick: tick
+						}),
 					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					$author$project$MoveSvg$Model(
 						{
@@ -11044,11 +11056,9 @@ var $author$project$MoveSvg$update = F2(
 							snake: $author$project$MoveSvg$moveSnake(snake),
 							tick: 0
 						}),
-					$elm$core$Platform$Cmd$none);
+					$elm$core$Platform$Cmd$none));
 		}
 	});
-var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
-var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
 var $author$project$MoveSvg$colorToString = function (_v0) {
 	var r = _v0.a.r;
 	var g = _v0.a.g;
@@ -11058,6 +11068,30 @@ var $author$project$MoveSvg$colorToString = function (_v0) {
 var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
 var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $author$project$MoveSvg$drawFoodComponent = F2(
+	function (color, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return A2(
+			$elm$svg$Svg$rect,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$cx(
+					$elm$core$String$fromInt(x)),
+					$elm$svg$Svg$Attributes$cy(
+					$elm$core$String$fromInt(y)),
+					$elm$svg$Svg$Attributes$width('24'),
+					$elm$svg$Svg$Attributes$height('24'),
+					$elm$svg$Svg$Attributes$fill(
+					$author$project$MoveSvg$colorToString(color))
+				]),
+			_List_Nil);
+	});
+var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
 var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
 var $author$project$MoveSvg$drawSnakeComponent = F2(
 	function (color, _v0) {
@@ -11082,9 +11116,9 @@ var $author$project$MoveSvg$Rgb = function (a) {
 };
 var $author$project$MoveSvg$exampleColor = $author$project$MoveSvg$Rgb(
 	{b: 55, g: 33, r: 33});
-var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $author$project$MoveSvg$foodColor = $author$project$MoveSvg$Rgb(
+	{b: 0, g: 0, r: 255});
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $author$project$MoveSvg$view = function (_v0) {
 	var snake = _v0.a.snake;
 	var food = _v0.a.food;
@@ -11103,13 +11137,13 @@ var $author$project$MoveSvg$view = function (_v0) {
 				$elm$svg$Svg$svg,
 				_List_fromArray(
 					[
-						$elm$svg$Svg$Attributes$width('800'),
-						$elm$svg$Svg$Attributes$height('800')
+						$elm$svg$Svg$Attributes$width('600'),
+						$elm$svg$Svg$Attributes$height('600')
 					]),
 				_List_fromArray(
 					[
 						A2($author$project$MoveSvg$drawSnakeComponent, $author$project$MoveSvg$exampleColor, head),
-						A2($author$project$MoveSvg$drawSnakeComponent, $author$project$MoveSvg$exampleColor, food)
+						A2($author$project$MoveSvg$drawFoodComponent, $author$project$MoveSvg$foodColor, food)
 					]))
 			]));
 };
