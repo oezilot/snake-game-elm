@@ -4,9 +4,10 @@ import Browser
 import Browser.Events exposing (onAnimationFrameDelta, onKeyDown)
 import Html exposing (..)
 import Json.Decode as Decode
-import Platform.Cmd exposing (batch)
-import Svg exposing (circle, rect, svg)
-import Svg.Attributes exposing (cx, cy, fill, height, r, width, x)
+import Platform.Sub exposing (batch)
+import String exposing (fromInt, join)
+import Svg exposing (..)
+import Svg.Attributes exposing (..)
 import Tuple exposing (first, second)
 
 
@@ -184,7 +185,7 @@ update msg (Model { snake, food, tick }) =
             )
 
         TimeTick ->
-            if tick < 25 then
+            if tick < 2 then
                 ( Model
                     { snake = snake
                     , food = food
@@ -207,12 +208,92 @@ update msg (Model { snake, food, tick }) =
 --------------------------------------------
 
 
-view : Model -> Html msg
-view model =
-    Html.text (Debug.toString model)
+foodColor : Color
+foodColor =
+    Rgb { r = 255, g = 0, b = 0 }
+
+
+exampleColor : Color
+exampleColor =
+    Rgb { r = 33, g = 33, b = 55 }
+
+
+view : Model -> Html Msg
+view (Model { snake, food, tick }) =
+    let
+        (Snake { direction, head, body, isGrowing }) =
+            snake
+    in
+    --Html.text (Debug.toString model)
+    div
+        []
+        [ svg
+            [ width "600"
+            , height "600"
+            ]
+            [ drawSnakeComponent
+                exampleColor
+                head
+            , drawFoodComponent foodColor food
+            ]
+        ]
+
+
+type Color
+    = Rgb { r : Int, g : Int, b : Int }
+
+
+colorToString : Color -> String
+colorToString (Rgb { r, g, b }) =
+    "rgb("
+        ++ fromInt r
+        ++ ","
+        ++ fromInt g
+        ++ ","
+        ++ fromInt b
+        ++ ")"
 
 
 
+-- generiert ein svg für ein einzelnes quadrat
+
+
+drawSnakeComponent : Color -> Position -> Svg Msg
+drawSnakeComponent color ( x, y ) =
+    circle [ cx (fromInt x), cy (fromInt y), r "12", fill (colorToString color) ] []
+
+
+drawFoodComponent : Color -> Position -> Svg Msg
+drawFoodComponent color ( x, y ) =
+    rect [ cx (fromInt x), cy (fromInt y), width "24", height "24", fill (colorToString color) ] []
+
+
+
+-- kreiert die schlange mit all ihren komponenten des körpers
+{- renderSnakeComponents : List Position -> Html msg
+   renderSnakeComponents  =
+       svg
+           [ width "120"
+           , height "120"
+           , viewBox "0 0 120 120"
+           ]
+           [ circle
+               [ cx "50"
+               , cy "50"
+               , r "50"
+               ]
+               []
+           ]
+-}
+{-
+   snake type as a note:
+   Snake
+           { direction : Direction -- 0, 1, 2, 3 -> nord, ost, sud, west
+           , head : Position
+           , body : List Position
+           , isGrowing : Bool
+           }
+-}
 --------------------------------------------
 
 
@@ -222,7 +303,7 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = \_ -> batch [ subscriptionKey, subscriptionTick ]
+        , subscriptions = \model -> batch [ subscriptionKey model, subscriptionTick model ]
         }
 
 
@@ -263,28 +344,3 @@ timeToMessage time =
 
 
 --------------------------------------------
-{-
-   view : Schlange -> Html Msg
-   view (Schlange ( x, y )) =
-       div []
-           [ p [] [ text <| String.fromInt x ++ " : " ++ String.fromInt y ]
-           , svg
-               [ height "200"
-               , width "200"
-               ]
-               [ rect
-                   [ fill "pink"
-                   , width "200"
-                   , height "200"
-                   ]
-                   []
-               , circle
-                   [ r "5"
-                   , cx (String.fromInt (20 * x))
-                   , cy (String.fromInt (20 * y))
-                   , fill "black"
-                   ]
-                   []
-               ]
-           ]
--}
