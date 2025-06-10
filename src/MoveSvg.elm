@@ -67,9 +67,30 @@ initialModel =
         }
 
 
+initialModelMultiple : Model
+initialModelMultiple =
+    Model
+        { snake =
+            Snake
+                { direction = Up
+                , head = ( 15, 15 )
+                , body =
+                    [ ( 15, 14 )
+                    , ( 15, 13 )
+                    , ( 15, 12 )
+                    , ( 15, 11 )
+                    , ( 15, 10 )
+                    ]
+                , isGrowing = False
+                }
+        , food = ( 10, 10 )
+        , tick = 0
+        }
+
+
 init : flags -> ( Model, Cmd Msg )
 init _ =
-    ( initialModel, Cmd.none )
+    ( initialModelMultiple, Cmd.none )
 
 
 
@@ -189,7 +210,7 @@ update msg (Model { snake, food, tick }) =
             )
 
         TimeTick ->
-            if tick < 2 then
+            if tick < 10 then
                 ( Model
                     { snake = snake
                     , food = food
@@ -231,6 +252,11 @@ exampleColor =
     Rgb { r = 33, g = 33, b = 55 }
 
 
+snakeColors : List String
+snakeColors =
+    [ "red", "yellow", "pink", "purple", "magenta", "blue", "brown" ]
+
+
 view : Model -> Html Msg
 view (Model { snake, food, tick }) =
     let
@@ -244,11 +270,12 @@ view (Model { snake, food, tick }) =
             [ width "600"
             , height "600"
             ]
-            [ drawSnakeComponent
+            (drawSnakeComponent
                 exampleColor
                 head
-            , drawFoodComponent foodColor food
-            ]
+                :: drawFoodComponent foodColor food
+                :: List.map drawSnakeComponentPink body
+            )
         ]
 
 
@@ -271,43 +298,28 @@ colorToString (Rgb { r, g, b }) =
 -- generiert ein svg für ein einzelnes quadrat
 
 
+resoloution : Int
+resoloution =
+    10
+
+
+drawSnakeComponentPink : Position -> Svg Msg
+drawSnakeComponentPink ( x, y ) =
+    circle [ cx (fromInt (x * 24)), cy (fromInt (y * 24)), r "12", fill "pink" ] []
+
+
 drawSnakeComponent : Color -> Position -> Svg Msg
 drawSnakeComponent color ( x, y ) =
-    circle [ cx (fromInt x), cy (fromInt y), r "12", fill (colorToString color) ] []
+    circle [ cx (fromInt (x * 24)), cy (fromInt (y * 24)), r "12", fill (colorToString color) ] []
 
 
 drawFoodComponent : Color -> Position -> Svg Msg
-drawFoodComponent color ( x, y ) =
-    rect [ cx (fromInt x), cy (fromInt y), width "24", height "24", fill (colorToString color) ] []
+drawFoodComponent color ( xx, yy ) =
+    rect [ x (fromInt ((xx * 24) - 6)), y (fromInt ((yy * 24) - 6)), width "24", height "24", fill (colorToString color) ] []
 
 
 
--- kreiert die schlange mit all ihren komponenten des körpers
-{- renderSnakeComponents : List Position -> Html msg
-   renderSnakeComponents  =
-       svg
-           [ width "120"
-           , height "120"
-           , viewBox "0 0 120 120"
-           ]
-           [ circle
-               [ cx "50"
-               , cy "50"
-               , r "50"
-               ]
-               []
-           ]
--}
-{-
-   snake type as a note:
-   Snake
-           { direction : Direction -- 0, 1, 2, 3 -> nord, ost, sud, west
-           , head : Position
-           , body : List Position
-           , isGrowing : Bool
-           }
--}
---------------------------------------------
+--------------------------------------
 
 
 main : Program () Model Msg
