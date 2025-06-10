@@ -1,5 +1,6 @@
 module MoveSvg exposing (..)
 
+import Actions exposing (Message)
 import Browser
 import Browser.Events exposing (onAnimationFrameDelta, onKeyDown)
 import Html exposing (..)
@@ -13,11 +14,30 @@ import Tuple exposing (first, second)
 
 
 --------------------------------------------
+-- so gross ist das spielfeld indem die schlange sich bewegt
 
 
 fieldDims : Int
 fieldDims =
     30
+
+
+
+-- "Pixelgrösse", das hier ist das ratio/resoloution (resoloution * einheiten = tatsächliche koordinaten auf dem svg)
+
+
+resoloution : Int
+resoloution =
+    10
+
+
+
+-- diese zahl besagt nach wie vielen frames gerendered werden soll
+
+
+tickCount : Int
+tickCount =
+    10
 
 
 type Direction
@@ -62,7 +82,7 @@ initialModel =
                 , body = []
                 , isGrowing = False
                 }
-        , food = ( 10, 10 )
+        , food = ( 0, 0 )
         , tick = 0
         }
 
@@ -83,7 +103,7 @@ initialModelMultiple =
                     ]
                 , isGrowing = False
                 }
-        , food = ( 10, 10 )
+        , food = ( 0, 0 )
         , tick = 0
         }
 
@@ -202,7 +222,7 @@ update msg (Model { snake, food, tick }) =
 
         FoodCollision ->
             ( Model
-                { snake = feedSnake snake
+                { snake = feedSnake snake -- feedsnake setzt lediglich isGrowing auf true!
                 , food = food
                 , tick = tick
                 }
@@ -219,18 +239,14 @@ update msg (Model { snake, food, tick }) =
                 , Cmd.none
                 )
 
-            else if head == food then
-                ( Model
-                    { snake = feedSnake snake
-                    , food = food
-                    , tick = tick
-                    }
-                , Cmd.none
-                )
-
             else
                 ( Model
-                    { snake = moveSnake snake
+                    { snake =
+                        if head == food then
+                            feedSnake snake
+
+                        else
+                            moveSnake snake
                     , food = food
                     , tick = 0
                     }
@@ -270,13 +286,19 @@ view (Model { snake, food, tick }) =
             [ width "600"
             , height "600"
             ]
-            (drawSnakeComponent
-                exampleColor
-                head
+            (drawBackground
+                :: drawSnakeComponent
+                    exampleColor
+                    head
                 :: drawFoodComponent foodColor food
                 :: List.map drawSnakeComponentPink body
             )
         ]
+
+
+drawBackground : Svg Msg
+drawBackground =
+    rect [ x (fromInt 0), y (fromInt 0), width "600", height "600", fill "green" ] []
 
 
 type Color
@@ -298,24 +320,23 @@ colorToString (Rgb { r, g, b }) =
 -- generiert ein svg für ein einzelnes quadrat
 
 
-resoloution : Int
-resoloution =
-    10
-
-
 drawSnakeComponentPink : Position -> Svg Msg
 drawSnakeComponentPink ( x, y ) =
-    circle [ cx (fromInt (x * 24)), cy (fromInt (y * 24)), r "12", fill "pink" ] []
+    circle [ cx (fromInt ((x * 24) + 12)), cy (fromInt ((y * 24) + 12)), r "12", fill "pink" ] []
 
 
 drawSnakeComponent : Color -> Position -> Svg Msg
 drawSnakeComponent color ( x, y ) =
-    circle [ cx (fromInt (x * 24)), cy (fromInt (y * 24)), r "12", fill (colorToString color) ] []
+    circle [ cx (fromInt ((x * 24) + 12)), cy (fromInt ((y * 24) + 12)), r "12", fill (colorToString color) ] []
+
+
+
+-- square components are positioned differently
 
 
 drawFoodComponent : Color -> Position -> Svg Msg
 drawFoodComponent color ( xx, yy ) =
-    rect [ x (fromInt ((xx * 24) - 6)), y (fromInt ((yy * 24) - 6)), width "24", height "24", fill (colorToString color) ] []
+    rect [ x (fromInt (xx * 24)), y (fromInt (yy * 24)), width "24", height "24", fill (colorToString color) ] []
 
 
 

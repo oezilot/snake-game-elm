@@ -10578,7 +10578,7 @@ var $author$project$MoveSvg$Snake = function (a) {
 var $author$project$MoveSvg$Up = {$: 'Up'};
 var $author$project$MoveSvg$initialModelMultiple = $author$project$MoveSvg$Model(
 	{
-		food: _Utils_Tuple2(10, 10),
+		food: _Utils_Tuple2(0, 0),
 		snake: $author$project$MoveSvg$Snake(
 			{
 				body: _List_fromArray(
@@ -11048,29 +11048,16 @@ var $author$project$MoveSvg$update = F2(
 				return (tick < 10) ? _Utils_Tuple2(
 					$author$project$MoveSvg$Model(
 						{food: food, snake: snake, tick: tick + 1}),
-					$elm$core$Platform$Cmd$none) : (_Utils_eq(head, food) ? _Utils_Tuple2(
-					$author$project$MoveSvg$Model(
-						{
-							food: food,
-							snake: $author$project$MoveSvg$feedSnake(snake),
-							tick: tick
-						}),
 					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					$author$project$MoveSvg$Model(
 						{
 							food: food,
-							snake: $author$project$MoveSvg$moveSnake(snake),
+							snake: _Utils_eq(head, food) ? $author$project$MoveSvg$feedSnake(snake) : $author$project$MoveSvg$moveSnake(snake),
 							tick: 0
 						}),
-					$elm$core$Platform$Cmd$none));
+					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$MoveSvg$colorToString = function (_v0) {
-	var r = _v0.a.r;
-	var g = _v0.a.g;
-	var b = _v0.a.b;
-	return 'rgb(' + ($elm$core$String$fromInt(r) + (',' + ($elm$core$String$fromInt(g) + (',' + ($elm$core$String$fromInt(b) + ')')))));
-};
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
@@ -11078,6 +11065,25 @@ var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $author$project$MoveSvg$drawBackground = A2(
+	$elm$svg$Svg$rect,
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$x(
+			$elm$core$String$fromInt(0)),
+			$elm$svg$Svg$Attributes$y(
+			$elm$core$String$fromInt(0)),
+			$elm$svg$Svg$Attributes$width('600'),
+			$elm$svg$Svg$Attributes$height('600'),
+			$elm$svg$Svg$Attributes$fill('green')
+		]),
+	_List_Nil);
+var $author$project$MoveSvg$colorToString = function (_v0) {
+	var r = _v0.a.r;
+	var g = _v0.a.g;
+	var b = _v0.a.b;
+	return 'rgb(' + ($elm$core$String$fromInt(r) + (',' + ($elm$core$String$fromInt(g) + (',' + ($elm$core$String$fromInt(b) + ')')))));
+};
 var $author$project$MoveSvg$drawFoodComponent = F2(
 	function (color, _v0) {
 		var xx = _v0.a;
@@ -11087,7 +11093,7 @@ var $author$project$MoveSvg$drawFoodComponent = F2(
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromInt((xx * 24) + 12)),
+					$elm$core$String$fromInt(xx * 24)),
 					$elm$svg$Svg$Attributes$y(
 					$elm$core$String$fromInt(yy * 24)),
 					$elm$svg$Svg$Attributes$width('24'),
@@ -11110,9 +11116,9 @@ var $author$project$MoveSvg$drawSnakeComponent = F2(
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$cx(
-					$elm$core$String$fromInt(x * 24)),
+					$elm$core$String$fromInt((x * 24) + 12)),
 					$elm$svg$Svg$Attributes$cy(
-					$elm$core$String$fromInt(y * 24)),
+					$elm$core$String$fromInt((y * 24) + 12)),
 					$elm$svg$Svg$Attributes$r('12'),
 					$elm$svg$Svg$Attributes$fill(
 					$author$project$MoveSvg$colorToString(color))
@@ -11127,9 +11133,9 @@ var $author$project$MoveSvg$drawSnakeComponentPink = function (_v0) {
 		_List_fromArray(
 			[
 				$elm$svg$Svg$Attributes$cx(
-				$elm$core$String$fromInt(x * 24)),
+				$elm$core$String$fromInt((x * 24) + 12)),
 				$elm$svg$Svg$Attributes$cy(
-				$elm$core$String$fromInt(y * 24)),
+				$elm$core$String$fromInt((y * 24) + 12)),
 				$elm$svg$Svg$Attributes$r('12'),
 				$elm$svg$Svg$Attributes$fill('pink')
 			]),
@@ -11166,11 +11172,14 @@ var $author$project$MoveSvg$view = function (_v0) {
 					]),
 				A2(
 					$elm$core$List$cons,
-					A2($author$project$MoveSvg$drawSnakeComponent, $author$project$MoveSvg$exampleColor, head),
+					$author$project$MoveSvg$drawBackground,
 					A2(
 						$elm$core$List$cons,
-						A2($author$project$MoveSvg$drawFoodComponent, $author$project$MoveSvg$foodColor, food),
-						A2($elm$core$List$map, $author$project$MoveSvg$drawSnakeComponentPink, body))))
+						A2($author$project$MoveSvg$drawSnakeComponent, $author$project$MoveSvg$exampleColor, head),
+						A2(
+							$elm$core$List$cons,
+							A2($author$project$MoveSvg$drawFoodComponent, $author$project$MoveSvg$foodColor, food),
+							A2($elm$core$List$map, $author$project$MoveSvg$drawSnakeComponentPink, body)))))
 			]));
 };
 var $author$project$MoveSvg$main = $elm$browser$Browser$element(
