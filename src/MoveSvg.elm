@@ -19,7 +19,7 @@ import Tuple exposing (first, second)
 
 fieldDims : Int
 fieldDims =
-    30
+    24
 
 
 
@@ -65,6 +65,7 @@ type Model
         { snake : Snake
         , food : Position
         , tick : Int
+        , state : Bool
         }
 
 
@@ -84,6 +85,7 @@ initialModel =
                 }
         , food = ( 0, 0 )
         , tick = 0
+        , state = True
         }
 
 
@@ -93,18 +95,19 @@ initialModelMultiple =
         { snake =
             Snake
                 { direction = Up
-                , head = ( 15, 15 )
+                , head = ( fieldDims // 2, fieldDims // 2 )
                 , body =
-                    [ ( 15, 14 )
-                    , ( 15, 13 )
-                    , ( 15, 12 )
-                    , ( 15, 11 )
-                    , ( 15, 10 )
+                    [ ( fieldDims // 2, (fieldDims // 2) - 1 )
+                    , ( fieldDims // 2, (fieldDims // 2) - 2 )
+                    , ( fieldDims // 2, (fieldDims // 2) - 3 )
+                    , ( fieldDims // 2, (fieldDims // 2) - 4 )
+                    , ( fieldDims // 2, (fieldDims // 2) - 5 )
                     ]
                 , isGrowing = False
                 }
         , food = ( 0, 0 )
         , tick = 0
+        , state = True
         }
 
 
@@ -211,20 +214,21 @@ moveSnake (Snake { direction, head, body, isGrowing }) =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg (Model { snake, food, tick }) =
+update msg (Model { snake, food, tick, state }) =
     let
         (Snake { direction, head, body, isGrowing }) =
             snake
     in
     case msg of
         Move dir ->
-            ( Model { snake = changeDirection dir snake, food = food, tick = tick }, Cmd.none )
+            ( Model { snake = changeDirection dir snake, food = food, tick = tick, state = state }, Cmd.none )
 
         FoodCollision ->
             ( Model
                 { snake = feedSnake snake -- feedsnake setzt lediglich isGrowing auf true!
                 , food = food
                 , tick = tick
+                , state = state
                 }
             , Cmd.none
             )
@@ -235,6 +239,17 @@ update msg (Model { snake, food, tick }) =
                     { snake = snake
                     , food = food
                     , tick = tick + 1
+                    , state = state
+                    }
+                , Cmd.none
+                )
+
+            else if state == False then
+                ( Model
+                    { snake = snake
+                    , food = food
+                    , tick = tick + 1
+                    , state = state
                     }
                 , Cmd.none
                 )
@@ -249,6 +264,22 @@ update msg (Model { snake, food, tick }) =
                             moveSnake snake
                     , food = food
                     , tick = 0
+                    , state =
+                        case head of
+                            ( 23, _ ) ->
+                                False
+
+                            ( _, 23 ) ->
+                                False
+
+                            ( _, 1 ) ->
+                                False
+
+                            ( 1, _ ) ->
+                                False
+
+                            _ ->
+                                True
                     }
                 , Cmd.none
                 )
@@ -274,7 +305,7 @@ snakeColors =
 
 
 view : Model -> Html Msg
-view (Model { snake, food, tick }) =
+view (Model { snake, food, tick, state }) =
     let
         (Snake { direction, head, body, isGrowing }) =
             snake

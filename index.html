@@ -10576,6 +10576,7 @@ var $author$project$MoveSvg$Snake = function (a) {
 	return {$: 'Snake', a: a};
 };
 var $author$project$MoveSvg$Up = {$: 'Up'};
+var $author$project$MoveSvg$fieldDims = 24;
 var $author$project$MoveSvg$initialModelMultiple = $author$project$MoveSvg$Model(
 	{
 		food: _Utils_Tuple2(0, 0),
@@ -10583,16 +10584,17 @@ var $author$project$MoveSvg$initialModelMultiple = $author$project$MoveSvg$Model
 			{
 				body: _List_fromArray(
 					[
-						_Utils_Tuple2(15, 14),
-						_Utils_Tuple2(15, 13),
-						_Utils_Tuple2(15, 12),
-						_Utils_Tuple2(15, 11),
-						_Utils_Tuple2(15, 10)
+						_Utils_Tuple2(($author$project$MoveSvg$fieldDims / 2) | 0, (($author$project$MoveSvg$fieldDims / 2) | 0) - 1),
+						_Utils_Tuple2(($author$project$MoveSvg$fieldDims / 2) | 0, (($author$project$MoveSvg$fieldDims / 2) | 0) - 2),
+						_Utils_Tuple2(($author$project$MoveSvg$fieldDims / 2) | 0, (($author$project$MoveSvg$fieldDims / 2) | 0) - 3),
+						_Utils_Tuple2(($author$project$MoveSvg$fieldDims / 2) | 0, (($author$project$MoveSvg$fieldDims / 2) | 0) - 4),
+						_Utils_Tuple2(($author$project$MoveSvg$fieldDims / 2) | 0, (($author$project$MoveSvg$fieldDims / 2) | 0) - 5)
 					]),
 				direction: $author$project$MoveSvg$Up,
-				head: _Utils_Tuple2(15, 15),
+				head: _Utils_Tuple2(($author$project$MoveSvg$fieldDims / 2) | 0, ($author$project$MoveSvg$fieldDims / 2) | 0),
 				isGrowing: false
 			}),
+		state: true,
 		tick: 0
 	});
 var $author$project$MoveSvg$init = function (_v0) {
@@ -11019,6 +11021,7 @@ var $author$project$MoveSvg$update = F2(
 		var snake = _v0.a.snake;
 		var food = _v0.a.food;
 		var tick = _v0.a.tick;
+		var state = _v0.a.state;
 		var _v1 = snake;
 		var direction = _v1.a.direction;
 		var head = _v1.a.head;
@@ -11032,6 +11035,7 @@ var $author$project$MoveSvg$update = F2(
 						{
 							food: food,
 							snake: A2($author$project$MoveSvg$changeDirection, dir, snake),
+							state: state,
 							tick: tick
 						}),
 					$elm$core$Platform$Cmd$none);
@@ -11041,22 +11045,58 @@ var $author$project$MoveSvg$update = F2(
 						{
 							food: food,
 							snake: $author$project$MoveSvg$feedSnake(snake),
+							state: state,
 							tick: tick
 						}),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return (tick < 10) ? _Utils_Tuple2(
 					$author$project$MoveSvg$Model(
-						{food: food, snake: snake, tick: tick + 1}),
+						{food: food, snake: snake, state: state, tick: tick + 1}),
+					$elm$core$Platform$Cmd$none) : ((!state) ? _Utils_Tuple2(
+					$author$project$MoveSvg$Model(
+						{food: food, snake: snake, state: state, tick: tick + 1}),
 					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					$author$project$MoveSvg$Model(
 						{
 							food: food,
 							snake: _Utils_eq(head, food) ? $author$project$MoveSvg$moveSnake(
 								$author$project$MoveSvg$feedSnake(snake)) : $author$project$MoveSvg$moveSnake(snake),
+							state: function () {
+								_v3$1:
+								while (true) {
+									_v3$2:
+									while (true) {
+										switch (head.a) {
+											case 23:
+												return false;
+											case 1:
+												switch (head.b) {
+													case 23:
+														break _v3$1;
+													case 1:
+														break _v3$2;
+													default:
+														return false;
+												}
+											default:
+												switch (head.b) {
+													case 23:
+														break _v3$1;
+													case 1:
+														break _v3$2;
+													default:
+														return true;
+												}
+										}
+									}
+									return false;
+								}
+								return false;
+							}(),
 							tick: 0
 						}),
-					$elm$core$Platform$Cmd$none);
+					$elm$core$Platform$Cmd$none));
 		}
 	});
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
@@ -11154,6 +11194,7 @@ var $author$project$MoveSvg$view = function (_v0) {
 	var snake = _v0.a.snake;
 	var food = _v0.a.food;
 	var tick = _v0.a.tick;
+	var state = _v0.a.state;
 	var _v1 = snake;
 	var direction = _v1.a.direction;
 	var head = _v1.a.head;
