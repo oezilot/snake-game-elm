@@ -10977,7 +10977,7 @@ var $author$project$MoveSvg$moveSnake = function (_v0) {
 						isGrowing ? body : $author$project$MoveSvg$allButLast(body)),
 					direction: direction,
 					head: _Utils_Tuple2(head.a - 1, head.b),
-					isGrowing: isGrowing
+					isGrowing: false
 				});
 		case 'Up':
 			return $author$project$MoveSvg$Snake(
@@ -10988,7 +10988,7 @@ var $author$project$MoveSvg$moveSnake = function (_v0) {
 						isGrowing ? body : $author$project$MoveSvg$allButLast(body)),
 					direction: direction,
 					head: _Utils_Tuple2(head.a, head.b - 1),
-					isGrowing: isGrowing
+					isGrowing: false
 				});
 		case 'Down':
 			return $author$project$MoveSvg$Snake(
@@ -10999,7 +10999,7 @@ var $author$project$MoveSvg$moveSnake = function (_v0) {
 						isGrowing ? body : $author$project$MoveSvg$allButLast(body)),
 					direction: direction,
 					head: _Utils_Tuple2(head.a, head.b + 1),
-					isGrowing: isGrowing
+					isGrowing: false
 				});
 		default:
 			return $author$project$MoveSvg$Snake(
@@ -11010,7 +11010,7 @@ var $author$project$MoveSvg$moveSnake = function (_v0) {
 						isGrowing ? body : $author$project$MoveSvg$allButLast(body)),
 					direction: direction,
 					head: _Utils_Tuple2(head.a + 1, head.b),
-					isGrowing: isGrowing
+					isGrowing: false
 				});
 	}
 };
@@ -11052,7 +11052,8 @@ var $author$project$MoveSvg$update = F2(
 					$author$project$MoveSvg$Model(
 						{
 							food: food,
-							snake: _Utils_eq(head, food) ? $author$project$MoveSvg$feedSnake(snake) : $author$project$MoveSvg$moveSnake(snake),
+							snake: _Utils_eq(head, food) ? $author$project$MoveSvg$moveSnake(
+								$author$project$MoveSvg$feedSnake(snake)) : $author$project$MoveSvg$moveSnake(snake),
 							tick: 0
 						}),
 					$elm$core$Platform$Cmd$none);
