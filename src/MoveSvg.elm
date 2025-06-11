@@ -161,7 +161,7 @@ moveSnake (Snake { direction, head, body, isGrowing }) =
                             else
                                 allButLast body
                            )
-                , isGrowing = isGrowing
+                , isGrowing = False
                 }
 
         Up ->
@@ -176,7 +176,7 @@ moveSnake (Snake { direction, head, body, isGrowing }) =
                             else
                                 allButLast body
                            )
-                , isGrowing = isGrowing
+                , isGrowing = False
                 }
 
         Down ->
@@ -191,7 +191,7 @@ moveSnake (Snake { direction, head, body, isGrowing }) =
                             else
                                 allButLast body
                            )
-                , isGrowing = isGrowing
+                , isGrowing = False
                 }
 
         Right ->
@@ -206,7 +206,7 @@ moveSnake (Snake { direction, head, body, isGrowing }) =
                             else
                                 allButLast body
                            )
-                , isGrowing = isGrowing
+                , isGrowing = False
                 }
 
 
@@ -243,7 +243,7 @@ update msg (Model { snake, food, tick }) =
                 ( Model
                     { snake =
                         if head == food then
-                            feedSnake snake
+                            snake |> feedSnake |> moveSnake
 
                         else
                             moveSnake snake
