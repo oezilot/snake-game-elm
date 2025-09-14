@@ -1,6 +1,5 @@
 module MoveSvg exposing (..)
 
-import Actions exposing (Message)
 import Browser
 import Browser.Events exposing (onAnimationFrameDelta, onKeyDown)
 import Html exposing (..)
@@ -97,11 +96,11 @@ initialModelMultiple =
                 { direction = Up
                 , head = ( fieldDims // 2, fieldDims // 2 )
                 , body =
-                    [ ( fieldDims // 2, (fieldDims // 2) - 1 )
-                    , ( fieldDims // 2, (fieldDims // 2) - 2 )
-                    , ( fieldDims // 2, (fieldDims // 2) - 3 )
-                    , ( fieldDims // 2, (fieldDims // 2) - 4 )
-                    , ( fieldDims // 2, (fieldDims // 2) - 5 )
+                    [ ( fieldDims // 2, (fieldDims // 2) + 1 )
+                    , ( fieldDims // 2, (fieldDims // 2) + 2 )
+                    , ( fieldDims // 2, (fieldDims // 2) + 3 )
+                    , ( fieldDims // 2, (fieldDims // 2) + 4 )
+                    , ( fieldDims // 2, (fieldDims // 2) + 5 )
                     ]
                 , isGrowing = False
                 }
@@ -122,7 +121,6 @@ init _ =
 
 type Msg
     = Move Direction
-    | FoodCollision
     | TimeTick
 
 
@@ -223,28 +221,11 @@ update msg (Model { snake, food, tick, state }) =
         Move dir ->
             ( Model { snake = changeDirection dir snake, food = food, tick = tick, state = state }, Cmd.none )
 
-        FoodCollision ->
-            ( Model
-                { snake = feedSnake snake -- feedsnake setzt lediglich isGrowing auf true!
-                , food = food
-                , tick = tick
-                , state = state
-                }
-            , Cmd.none
-            )
-
         TimeTick ->
-            if tick < 10 then
-                ( Model
-                    { snake = snake
-                    , food = food
-                    , tick = tick + 1
-                    , state = state
-                    }
-                , Cmd.none
-                )
+            if state == False then
+                ( Model { snake = snake, food = food, tick = tick, state = state }, Cmd.none )
 
-            else if state == False then
+            else if tick < 10 then
                 ( Model
                     { snake = snake
                     , food = food
@@ -266,16 +247,16 @@ update msg (Model { snake, food, tick, state }) =
                     , tick = 0
                     , state =
                         case head of
-                            ( 23, _ ) ->
+                            ( 24, _ ) ->
                                 False
 
-                            ( _, 23 ) ->
+                            ( _, 24 ) ->
                                 False
 
-                            ( _, 1 ) ->
+                            ( _, 0 ) ->
                                 False
 
-                            ( 1, _ ) ->
+                            ( 0, _ ) ->
                                 False
 
                             _ ->
